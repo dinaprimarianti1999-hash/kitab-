@@ -1,0 +1,453 @@
+
+
+Flip box kitab allah · HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flip Box – Iman kepada Kitab-Kitab Allah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b3d5c;
+    --blue:#1565c0;
+    --blue-deep:#0d3b66;
+    --green:#0f9d58;
+    --green-deep:#0b6e3f;
+    --gold:#d4af37;
+    --gold-light:#f4d97e;
+    --white:#ffffff;
+    --ink:#0b2b3a;
+    --red-soft:#e57373;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; height:100%;
+    font-family:'Nunito',sans-serif; color:var(--ink);
+    user-select:none; -webkit-tap-highlight-color:transparent;
+    overflow:hidden;
+  }
+  body{
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue-deep) 45%, var(--green-deep) 100%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+  }
+  h1,h2,h3{ font-family:'Fredoka',sans-serif; margin:0; }
+ 
+  .board{
+    position:relative;
+    width:min(96vw, 170vh);
+    aspect-ratio:16/9;
+    background:
+      radial-gradient(1100px 500px at 15% 0%, rgba(255,255,255,0.07), transparent 60%),
+      radial-gradient(900px 500px at 100% 100%, rgba(212,175,55,0.10), transparent 60%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 2px, transparent 2px, transparent 26px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 26px),
+      linear-gradient(160deg, #0b3d5c 0%, #0d3b66 40%, #0b6e3f 100%);
+    border-radius:26px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45), inset 0 0 0 3px rgba(212,175,55,0.55), inset 0 0 0 8px rgba(255,255,255,0.05);
+    display:flex; flex-direction:column; align-items:center;
+    padding:1.4% 2.4% 1.2%;
+    overflow:hidden;
+  }
+ 
+  /* corner ornaments (islamic 8-point star motif, simple) */
+  .corner{ position:absolute; width:9%; aspect-ratio:1/1; opacity:0.55; pointer-events:none; z-index:1; }
+  .corner .sq{ position:absolute; inset:8%; border:2.5px solid var(--gold); }
+  .corner .sq.a{ transform: rotate(0deg); }
+  .corner .sq.b{ transform: rotate(45deg); }
+  .corner .dot{ position:absolute; top:50%; left:50%; width:8px; height:8px; background:var(--gold); border-radius:50%; transform:translate(-50%,-50%); }
+  .corner.tl{ top:1.2%; left:1.2%; }
+  .corner.tr{ top:1.2%; right:1.2%; }
+  .corner.bl{ bottom:1.2%; left:1.2%; }
+  .corner.br{ bottom:1.2%; right:1.2%; }
+ 
+  /* header */
+  .header{ width:100%; display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:2; }
+  .title-block{ flex:1; text-align:center; padding-top:0.4%; }
+  .main-title{
+    font-size:clamp(20px, 2.6vw, 34px); font-weight:700; color:var(--white);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+    letter-spacing:0.3px;
+  }
+  .main-title .accent{ color:var(--gold-light); }
+  .instruction{
+    margin-top:0.5%; font-size:clamp(11px,1.05vw,15px); font-weight:700;
+    color:#eaf6ff; background:rgba(255,255,255,0.10); display:inline-block;
+    padding:0.4% 1.6%; border-radius:999px; border:1px solid rgba(255,255,255,0.18);
+  }
+ 
+  .hud{
+    display:flex; flex-direction:column; gap:6px; align-items:flex-end; min-width:150px; padding-top:2px;
+  }
+  .hud-row{ display:flex; gap:8px; }
+  .hud-pill{
+    background:rgba(255,255,255,0.92); border-radius:12px; padding:5px 12px;
+    font-weight:900; font-size:clamp(11px,1vw,14px); color:var(--blue-deep);
+    box-shadow:0 4px 10px rgba(0,0,0,0.25); display:flex; align-items:center; gap:5px;
+    white-space:nowrap;
+  }
+  .hud-pill.score{ color:var(--green-deep); }
+  .restart-btn{
+    border:none; border-radius:12px; padding:6px 14px; font-weight:900; font-size:clamp(11px,1vw,13px);
+    background:linear-gradient(135deg, var(--gold), #b8860b); color:#3a2a00; cursor:pointer;
+    box-shadow:0 5px 12px rgba(0,0,0,0.3); display:flex; align-items:center; gap:6px;
+    transition: transform .12s ease;
+  }
+  .restart-btn:active{ transform:scale(0.94); }
+ 
+  /* grid */
+  .grid-wrap{ flex:1; width:100%; display:flex; align-items:center; justify-content:center; position:relative; z-index:2; }
+  .grid{
+    display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr);
+    gap: 1.4%; width:88%; height:92%;
+  }
+  .card{ perspective:1000px; cursor:pointer; }
+  .card-inner{
+    position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .card.open .card-inner{ transform:rotateY(180deg); }
+  .card-face{
+    position:absolute; inset:0; border-radius:16px; backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow:0 8px 18px rgba(0,0,0,0.28);
+  }
+  .card-front{
+    background:linear-gradient(150deg,#eaf3ff 0%, #d7ecff 100%);
+    border:3px solid var(--blue);
+  }
+  .card-front .book{ font-size:clamp(24px,3.6vw,46px); color:var(--blue); filter:drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
+  .card-front .qmark{
+    position:absolute; font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(16px,2.4vw,28px);
+    color:var(--gold); text-shadow:0 2px 3px rgba(0,0,0,0.15);
+  }
+  .card-back{
+    background:linear-gradient(150deg,#ffffff 0%, #f4f9ff 100%);
+    border:3px solid var(--gold);
+    transform:rotateY(180deg);
+    padding:4% 3%;
+    text-align:center;
+  }
+  .card-back .icon{ font-size:clamp(16px,2vw,24px); margin-bottom:2%; }
+  .card-back .label{
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:clamp(11px,1.35vw,18px);
+    color:var(--blue-deep); line-height:1.15;
+  }
+  .card-back.type-nabi .label{ color:var(--green-deep); }
+ 
+  .card.matched .card-back{ border-color:var(--green); background:linear-gradient(150deg,#e9fdf0,#d3f8de); animation:matchPulse .6s ease; }
+  @keyframes matchPulse{ 0%{ box-shadow:0 0 0 0 rgba(15,157,88,0.55);} 100%{ box-shadow:0 0 0 16px rgba(15,157,88,0);} }
+  .card.wrong .card-back{ border-color:var(--red-soft); background:linear-gradient(150deg,#fff0f0,#ffe1e1); }
+  .card.matched .card-inner{ cursor:default; }
+ 
+  .stars-burst{ position:absolute; inset:0; pointer-events:none; overflow:visible; }
+  .star-p{
+    position:absolute; left:50%; top:50%; font-size:16px; opacity:0;
+    animation: starPop 0.9s ease-out forwards;
+  }
+  @keyframes starPop{
+    0%{ opacity:1; transform:translate(-50%,-50%) scale(0.3); }
+    100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1); }
+  }
+ 
+  .toast{
+    position:absolute; left:50%; top:10%; transform:translateX(-50%) translateY(-14px);
+    background:rgba(255,255,255,0.96); padding:9px 22px; border-radius:999px;
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:clamp(13px,1.5vw,19px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.3); opacity:0; z-index:20; pointer-events:none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.good{ color:var(--green-deep); border:2px solid var(--green); }
+  .toast.bad{ color:#b23b3b; border:2px solid var(--red-soft); }
+ 
+  .footer-note{
+    width:100%; text-align:center; margin-top:0.6%; position:relative; z-index:2;
+    font-size:clamp(11px,1.05vw,15px); font-weight:800; color:#fff6da;
+    background:rgba(0,0,0,0.18); border:1px solid rgba(212,175,55,0.4);
+    padding:0.5% 1%; border-radius:12px;
+  }
+ 
+  .win-overlay{
+    position:absolute; inset:0; background:rgba(6,20,30,0.72); z-index:30;
+    display:none; align-items:center; justify-content:center; text-align:center; border-radius:26px;
+  }
+  .win-overlay.show{ display:flex; }
+  .win-card{
+    background:linear-gradient(160deg,#ffffff,#f2f8ff); border-radius:24px; padding:3% 5%;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5); border:3px solid var(--gold);
+    max-width:70%;
+  }
+  .win-card .emoji{ font-size:clamp(30px,4vw,54px); }
+  .win-card h2{ font-size:clamp(18px,2.6vw,30px); color:var(--blue-deep); margin-top:1%; }
+  .win-card p{ font-weight:800; color:var(--green-deep); margin-top:1%; font-size:clamp(12px,1.4vw,17px); }
+  .win-card button{
+    margin-top:3%; border:none; border-radius:14px; padding:10px 26px; font-weight:900; cursor:pointer;
+    background:linear-gradient(135deg,var(--green),var(--green-deep)); color:white; font-size:clamp(12px,1.3vw,16px);
+    box-shadow:0 8px 18px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+ 
+<div class="board" id="board">
+  <div class="corner tl"><div class="sq a"></div><div class="sq b"></div><div class="dot"></div></div>
+  <div class="corner tr"><div class="sq a"></div><div class="sq b"></div><div class="dot"></div></div>
+  <div class="corner bl"><div class="sq a"></div><div class="sq b"></div><div class="dot"></div></div>
+  <div class="corner br"><div class="sq a"></div><div class="sq b"></div><div class="dot"></div></div>
+ 
+  <div class="header">
+    <div style="width:150px;"></div>
+    <div class="title-block">
+      <div class="main-title">🎮 Flip Box – Iman kepada <span class="accent">Kitab-Kitab Allah</span></div>
+      <div class="instruction">Sentuh dua kotak untuk menemukan pasangan yang benar antara kitab Allah dan rasul penerimanya.</div>
+    </div>
+    <div class="hud">
+      <div class="hud-row">
+        <div class="hud-pill score">⭐ <span id="scoreVal">0</span></div>
+        <div class="hud-pill">⏱️ <span id="timerVal">00:00</span></div>
+      </div>
+      <button class="restart-btn" id="restartBtn">🔁 Ulangi Permainan</button>
+    </div>
+  </div>
+ 
+  <div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+ 
+  <div class="footer-note">Beriman kepada kitab-kitab Allah termasuk rukun iman yang wajib diyakini setiap muslim.</div>
+ 
+  <div class="win-overlay" id="winOverlay">
+    <div class="win-card">
+      <div class="emoji">🏆✨</div>
+      <h2>Masya Allah, Semua Pasangan Ditemukan!</h2>
+      <p id="winSummary">Skor: 0 · Waktu: 00:00</p>
+      <button id="winRestart">🔁 Main Lagi</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+(function(){
+  const PAIRS = [
+    { key:0, kitab:{icon:'📖', label:'Taurat'}, nabi:{icon:'☪️', label:'Nabi Musa a.s.'} },
+    { key:1, kitab:{icon:'📖', label:'Zabur'}, nabi:{icon:'☪️', label:'Nabi Daud a.s.'} },
+    { key:2, kitab:{icon:'📖', label:'Injil'}, nabi:{icon:'☪️', label:'Nabi Isa a.s.'} },
+    { key:3, kitab:{icon:'📖', label:'Al-Qur’an'}, nabi:{icon:'☪️', label:'Nabi Muhammad ﷺ'} },
+  ];
+ 
+  const grid = document.getElementById('grid');
+  const scoreVal = document.getElementById('scoreVal');
+  const timerVal = document.getElementById('timerVal');
+  const restartBtn = document.getElementById('restartBtn');
+  const winRestart = document.getElementById('winRestart');
+  const winOverlay = document.getElementById('winOverlay');
+  const winSummary = document.getElementById('winSummary');
+ 
+  let cards = [];
+  let openCards = [];
+  let lock = false;
+  let score = 0;
+  let matchedPairs = 0;
+  let seconds = 0;
+  let timerInterval = null;
+ 
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+ 
+  function buildDeck(){
+    let deck = [];
+    PAIRS.forEach(p=>{
+      deck.push({ pairKey:p.key, type:'kitab', icon:p.kitab.icon, label:p.kitab.label });
+      deck.push({ pairKey:p.key, type:'nabi', icon:p.nabi.icon, label:p.nabi.label });
+    });
+    return shuffle(deck);
+  }
+ 
+  function fmtTime(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const ss = (s%60).toString().padStart(2,'0');
+    return m+':'+ss;
+  }
+ 
+  function startTimer(){
+    stopTimer();
+    seconds = 0;
+    timerVal.textContent = fmtTime(seconds);
+    timerInterval = setInterval(()=>{
+      seconds++;
+      timerVal.textContent = fmtTime(seconds);
+    }, 1000);
+  }
+  function stopTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
+ 
+  function speak(text){
+    try{
+      if('speechSynthesis' in window){
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'id-ID';
+        u.rate = 0.95;
+        u.pitch = 1.05;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      }
+    }catch(e){}
+  }
+ 
+  function chime(good){
+    try{
+      const ctx = new (window.AudioContext||window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = good ? 880 : 220;
+      g.gain.value = 0.06;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      o.frequency.exponentialRampToValueAtTime(good ? 1320 : 180, ctx.currentTime + 0.28);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.32);
+      o.stop(ctx.currentTime + 0.34);
+    }catch(e){}
+  }
+ 
+  function showToast(text, good){
+    const t = document.createElement('div');
+    t.className = 'toast ' + (good?'good':'bad');
+    t.textContent = text;
+    document.getElementById('board').appendChild(t);
+    requestAnimationFrame(()=> t.classList.add('show'));
+    setTimeout(()=>{
+      t.classList.remove('show');
+      setTimeout(()=> t.remove(), 300);
+    }, 1300);
+  }
+ 
+  function burstStars(cardEl){
+    const wrap = document.createElement('div');
+    wrap.className = 'stars-burst';
+    cardEl.appendChild(wrap);
+    const n = 8;
+    for(let i=0;i<n;i++){
+      const s = document.createElement('div');
+      s.className = 'star-p';
+      s.textContent = '✨';
+      const angle = (Math.PI*2*i)/n;
+      const dist = 46 + Math.random()*18;
+      s.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+      s.style.setProperty('--dy', Math.sin(angle)*dist + 'px');
+      s.style.animationDelay = (Math.random()*0.15)+'s';
+      wrap.appendChild(s);
+    }
+    setTimeout(()=> wrap.remove(), 1100);
+  }
+ 
+  function renderGrid(){
+    grid.innerHTML = '';
+    cards = buildDeck().map((d,i)=>({ ...d, id:i, opened:false, matched:false }));
+ 
+    cards.forEach(cardData=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.id = cardData.id;
+ 
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="book">📖</div>
+            <div class="qmark">?</div>
+          </div>
+          <div class="card-face card-back type-${cardData.type}">
+            <div class="icon">${cardData.icon}</div>
+            <div class="label">${cardData.label}</div>
+          </div>
+        </div>`;
+ 
+      card.addEventListener('click', ()=> onCardClick(card, cardData));
+      grid.appendChild(card);
+    });
+  }
+ 
+  function onCardClick(cardEl, cardData){
+    if(lock) return;
+    if(cardData.opened || cardData.matched) return;
+    if(openCards.length===2) return;
+ 
+    cardData.opened = true;
+    cardEl.classList.add('open');
+    openCards.push({ cardEl, cardData });
+ 
+    if(openCards.length===2){
+      lock = true;
+      const [c1, c2] = openCards;
+      const isMatch = c1.cardData.pairKey === c2.cardData.pairKey && c1.cardData.type !== c2.cardData.type;
+ 
+      if(isMatch){
+        setTimeout(()=>{
+          c1.cardData.matched = true; c2.cardData.matched = true;
+          c1.cardEl.classList.add('matched');
+          c2.cardEl.classList.add('matched');
+          burstStars(c1.cardEl);
+          burstStars(c2.cardEl);
+          chime(true);
+          speak('Masya Allah! Jawaban Benar.');
+          showToast('✨ Masya Allah! Jawaban Benar ✨', true);
+          score += 10;
+          scoreVal.textContent = score;
+          matchedPairs++;
+          openCards = [];
+          lock = false;
+          if(matchedPairs === PAIRS.length){
+            setTimeout(()=> finishGame(), 700);
+          }
+        }, 350);
+      } else {
+        c1.cardEl.classList.add('wrong');
+        c2.cardEl.classList.add('wrong');
+        chime(false);
+        showToast('Yuk coba lagi!', false);
+        setTimeout(()=>{
+          c1.cardEl.classList.remove('open','wrong');
+          c2.cardEl.classList.remove('open','wrong');
+          c1.cardData.opened = false;
+          c2.cardData.opened = false;
+          openCards = [];
+          lock = false;
+        }, 2000);
+      }
+    }
+  }
+ 
+  function finishGame(){
+    stopTimer();
+    winSummary.textContent = 'Skor: ' + score + ' · Waktu: ' + fmtTime(seconds);
+    winOverlay.classList.add('show');
+  }
+ 
+  function resetGame(){
+    window.speechSynthesis && window.speechSynthesis.cancel();
+    openCards = [];
+    lock = false;
+    score = 0;
+    matchedPairs = 0;
+    scoreVal.textContent = 0;
+    winOverlay.classList.remove('show');
+    renderGrid();
+    startTimer();
+  }
+ 
+  restartBtn.addEventListener('click', resetGame);
+  winRestart.addEventListener('click', resetGame);
+ 
+  resetGame();
+})();
+</script>
+</body>
+</html>
+ 
